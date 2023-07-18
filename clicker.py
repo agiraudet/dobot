@@ -99,7 +99,9 @@ class Game:
     def gotoCell(self, cellX, cellY):
         coordY = self.cellH * cellY + self.cellH / 2
         coordX = self.cellW * cellX + self.cellW / 2
+        pyautogui.keyDown('e')
         pyautogui.click(self.region.x + coordX, self.region.y + coordY)
+        pyautogui.keyUp('e')
 
     def group_pixels(self, points, radius):
         grouped_points = []
@@ -202,8 +204,10 @@ class Game:
             navTo = int(inp)
             if navTo >= 0 and navTo < i:
                 break
+        pyautogui.keyDown('e')
         pyautogui.click(
             self.region.x + comp[navTo][0], self.region.y + comp[navTo][1])
+        pyautogui.keyUp('e')
 
     def waitForMapChange(self, timeout=5):
         startTime = int(time.time())
@@ -299,8 +303,10 @@ class AutoPilot:
 
     def gotoDir(self, compass, dir):
         self.updateState(dir)
+        pyautogui.keyDown('e')
         pyautogui.click(self.game.region.x +
                         compass[0], self.game.region.y + compass[1])
+        pyautogui.keyUp('e')
         self.game.waitForMapChange()
         print(f"[AP]believes to be at ({self.curX}, {self.curY})")
         self.checkCurCoord()
@@ -317,7 +323,7 @@ class AutoPilot:
             if d in compMap:
                 self.gotoDir(compMap[d], d)
                 return True
-        print("[AP] seems stucked:")
+        print("[AP]Seems stucked:")
         print(self.histo)
         return False
 
@@ -341,7 +347,7 @@ class AutoPilot:
             dir = self.chooseDir(toX, toY)
             if self.goto(dir) is False:
                 return False
-        print('Arrived')
+        print('[AP]>>>> Arrived to waypoint')
         print(self.histo)
         return True
 
