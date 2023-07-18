@@ -162,13 +162,13 @@ class Game:
         # cv2.imwrite('highlighted_elements.png', threshold)
 
     def findCompassDir(self, compass):
-        if compass[1] < self.cellH * 2 + 20:
+        if compass[1] < self.cellH * 2.1:
             return 'N'
-        if compass[1] > self.region.h - self.cellH - 20:
+        if compass[1] > self.region.h - self.cellH * 2.1:
             return 'S'
-        if compass[0] < self.cellW + 20:
+        if compass[0] < self.cellW * 2.1:
             return 'W'
-        if compass[0] > self.region.w - self.cellW - 20:
+        if compass[0] > self.region.w - self.cellW * 2.1:
             return 'E'
         return '?'
 
@@ -228,6 +228,7 @@ class AutoPilot:
         self.setCurCoord()
         self.histo = []
         self.realCoord = []
+        self.waypoints = []
 
     def setCurCoord(self):
         coord = self.game.lookatCoord()
@@ -245,7 +246,7 @@ class AutoPilot:
             print(
                 f"[AP]Real Coords seems to be {coord}, expected {self.curX, self.curY}")
             self.realCoord.append(coord)
-            if len(self.realCoord) >= 2:
+            if len(self.realCoord) >= 3:
                 self.correctCoord()
         else:
             self.realCoord = []
@@ -259,6 +260,7 @@ class AutoPilot:
             if diffX > 1 or diffY > 1 or (diffX >= 1 and diffY >= 1):
                 print("[AP]Removing odd values from RC")
                 del self.realCoord[0]
+                print(self.realCoord)
                 return
         print(
             f"[AP]Correcting coord from ({self.curX}, {self.curY}) to {self.realCoord[-1]}")
@@ -294,13 +296,13 @@ class AutoPilot:
             self.curX -= 1
         elif dir == 'E':
             self.curX += 1
-        print(f"[AP]believes to be at ({self.curX}, {self.curY})")
 
     def gotoDir(self, compass, dir):
         self.updateState(dir)
         pyautogui.click(self.game.region.x +
                         compass[0], self.game.region.y + compass[1])
         self.game.waitForMapChange()
+        print(f"[AP]believes to be at ({self.curX}, {self.curY})")
         self.checkCurCoord()
 
     def goto(self, dir):
@@ -314,9 +316,10 @@ class AutoPilot:
                 continue
             if d in compMap:
                 self.gotoDir(compMap[d], d)
-                return
+                return True
         print("[AP] seems stucked:")
         print(self.histo)
+        return False
 
     def chooseDir(self, toX, toY):
         diffX = abs(toX - self.curX)
@@ -336,25 +339,42 @@ class AutoPilot:
         print(f"[AP] Set to ({toX}, {toY})")
         while self.curY != toY or self.curX != toX:
             dir = self.chooseDir(toX, toY)
-            self.goto(dir)
+            if self.goto(dir) is False:
+                return False
         print('Arrived')
         print(self.histo)
-        exit(0)
+        return True
 
     def menu(self):
-        print('Where to ?')
-        x = input('x> ')
-        y = input('y> ')
-        self.navigateTo(int(x), int(y))
+        print('##### AutoPilot targeting #####')
+        i = 0
+        while True:
+            print(f'| Point {i}:')
+            i += 1
+            x = input('| x> ')
+            y = input('| y> ')
+            self.waypoints.append((int(x), int(y)))
+
+            m = ' '
+            while m != 'A' and m != 'a' and m != 'G' and m != 'g':
+                m = input("| (A)dd waypoint/(G)o> ")
+            if m == 'g' or m == 'G':
+                break
+        print(f"| {i} Waypoints.")
+        print('###############################')
+        for wp in self.waypoints:
+            if self.navigateTo(wp[0], wp[1]) is False:
+                exit(1)
+        exit(0)
 
 
 try:
     game = Game()
+    pilot = AutoPilot(game)
 except Exception as e:
     print(e)
     exit(1)
 
-pilot = AutoPilot(game)
 pilot.menu()
 
 # game.region.show(1)
