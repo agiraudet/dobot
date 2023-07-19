@@ -6,9 +6,10 @@ import time
 
 
 class Farmer:
-    def __init__(self, game, resFile, collectFile, delay, delayAddMax=1.):
+    def __init__(self, game, fighter, resFile, collectFile, delay, delayAddMax=1.):
         print("[Farmer]Init...")
         self.game = game
+        self.fighter = fighter
         self.readyBeac = cv2.imread('beacons/btn/ready.png', 0)
         self.collectBeac = cv2.imread(collectFile, 0)
         self.resBeac = cv2.imread(resFile, 0)
@@ -32,22 +33,26 @@ class Farmer:
         return True
 
     def collect(self):
-        print('res')
+        print("res")
         self.lookFor(self.resBeac)
-        print('action')
+        print("act")
         self.lookFor(self.collectBeac)
 
     def checkFight(self):
-        print('fight')
+        print("rdy")
         if self.lookFor(self.readyBeac):
             print('[Farmer]Fight detected')
-            return False
-        return True
+            if self.fighter is not None:
+                self.fighter.fight()
+            return True
+        return False
 
     def farm(self):
         try:
-            while self.checkFight():
+            while True:
+                self.checkFight()
                 if self.collect():
                     time.sleep(random.uniform(self.delayMin, self.delayMax))
         except KeyboardInterrupt:
+            print("[Farmer]Ctrl+C interrupt")
             return

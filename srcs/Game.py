@@ -27,6 +27,7 @@ class Game:
             h=(chatLoc.top - discoLoc.top)
         )
         self.coordRegion = self.initCoordRegion()
+        self.guiRegion = self.findGUI()
         self.cellW = self.region.w / 28
         self.cellH = self.region.h / 34
 
@@ -36,6 +37,14 @@ class Game:
             y=self.region.h / 13 + self.region.y,
             w=self.region.w / 5,
             h=self.region.h / 20
+        )
+
+    def findGUI(self):
+        return Region(
+            x=self.region.x,
+            y=self.region.y + self.region.h,
+            w=self.region.w,
+            h=self.region.h / 2
         )
 
     def translateCoord(self, text):

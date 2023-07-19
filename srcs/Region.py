@@ -24,6 +24,7 @@ class Region:
 
     def screenshot(self, save=''):
         if len(save) > 0:
+            print("f[RG]Saved {save}")
             return pyautogui.screenshot(save, region=(
                 self.x,
                 self.y,
