@@ -5,8 +5,6 @@ import pyautogui
 import random
 import time
 
-import utils
-
 
 class Fighter:
     def __init__(self, game, spellSlot, spellTries):
@@ -68,43 +66,6 @@ class Fighter:
             return (centerX, centerY)
         return None
 
-    def movePossible(self, pos):
-        pyautogui.moveTo(pos[0], pos[1])
-        sc = self.game.region.screenshot()
-        pix = sc.getpixel((pos[0] - self.game.region.x,
-                          pos[1] - self.game.region.y))
-        if pix[0] > 245:
-            return True
-        return False
-
-    def moveIncPos(self, pos, plrPos, mobPos):
-        posX = pos[0]
-        posY = pos[1]
-        if mobPos[0] - plrPos[0] < 0:
-            posX -= self.game.cellW / 2
-        else:
-            posX += self.game.cellW / 2
-        if mobPos[1] - plrPos[1] < 0:
-            posY -= self.game.cellH / 2
-        else:
-            posY += self.game.cellH / 2
-        return (posX, posY)
-
-    def move(self):
-        plrPos = self.findCharPos(self.plrLowHSV, self.plrHighHSV)
-        mobPos = self.findCharPos(self.mobLowHSV, self.mobHighHSV)
-        if plrPos is None or mobPos is None:
-            return
-        okMoves = plrPos
-        pyautogui.moveTo(plrPos[0], plrPos[1])
-        cursPos = self.moveIncPos(plrPos, plrPos, mobPos)
-        for i in range(self.maxMoveTries):
-            cursPos = self.moveIncPos(cursPos, plrPos, mobPos)
-            if self.movePossible(cursPos):
-                okMoves = cursPos
-        pyautogui.click(okMoves[0], okMoves[1])
-        time.sleep(random.uniform(1., 1.5))
-
     def moveAround(self):
         plrPos = self.findCharPos(self.plrLowHSV, self.plrHighHSV)
         mobPos = self.findCharPos(self.mobLowHSV, self.mobHighHSV)
@@ -115,6 +76,7 @@ class Fighter:
                      mobPos[1] - self.game.region.y)
         bestPos = self.findBestMove(mobRelPos)
         if bestPos is not None:
+            print("[Fighter]Can move: moving")
             pyautogui.click(
                 bestPos[0] + self.game.region.x,
                 bestPos[1] + self.game.region.y
@@ -202,18 +164,19 @@ class Fighter:
 
     def fight(self):
         print("[Fighter]Started fight")
-        self.moveAround()
-        exit()
         self.minimizeGui()
         pyautogui.moveTo(self.game.region.x + self.game.region.w / 2,
                          self.game.region.y + self.game.region.h / 2)
         try:
             while self.waitForNextTurn():
                 print('[Fighter]New turn')
-                self.move()
+                self.moveAround()
+                time.sleep(random.uniform(0.8, 1.2))
                 for n in range(self.spellTries):
+                    print(
+                        f"[Fighter]Casting spell {self.spell} {n+1}/{self.spellTries}")
                     self.launchSpell()
-                    time.sleep(random.uniform(0.2, 0.5))
+                    time.sleep(random.uniform(0.6, 0.9))
                 pyautogui.keyDown('f1')
                 time.sleep(random.uniform(0.01, 0.03))
                 pyautogui.keyUp('f1')
