@@ -11,7 +11,7 @@ class AutoPilot:
         self.waypoints = []
 
     def setCurCoord(self):
-        coord = self.game.lookatCoord()
+        coord = self.game.readCoord()
         if coord is None:
             raise Exception("Could not find current coordinates")
         self.curX = coord[0]
@@ -19,7 +19,8 @@ class AutoPilot:
         print(f"[AP]Started at ({coord[0]}, {coord[1]})")
 
     def checkCurCoord(self):
-        coord = self.game.lookatCoord()
+        coord = self.game.readCoord()
+        print(coord)
         if coord is None:
             return 0
         if coord[0] != self.curX or coord[1] != self.curY:

@@ -6,6 +6,15 @@ import random
 import time
 
 
+class Spell:
+    def __init__(self, hotkey, target):
+        self.hotkey = hotkey
+        self.target = target
+
+    def targetInRange(self, targetPos):
+        pass
+
+
 class Fighter:
     def __init__(self, game, spellSlot, spellTries):
         print("[Fighter]Init...")
@@ -61,8 +70,6 @@ class Fighter:
             centerY = int(M["m01"] / M["m00"])
             centerX += self.game.region.x
             centerY += self.game.region.y
-            # pyautogui.moveTo(centerX, centerY, random.uniform(
-            #     0.2, 0.5), pyautogui.easeOutQuad)
             return (centerX, centerY)
         return None
 

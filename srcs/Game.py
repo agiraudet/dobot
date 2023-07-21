@@ -56,6 +56,19 @@ class Game:
         coord = matches[0].split(',')
         return (int(coord[0]), int(coord[1]))
 
+    def readCoord(self):
+        lowHSV = (0, 0, 125)
+        highHSV = (50, 35, 255)
+        sc = self.coordRegion.screenshot()
+        hsv = cv2.cvtColor(numpy.array(sc), cv2.COLOR_RGB2HSV)
+        mask = cv2.inRange(hsv, lowHSV, highHSV)
+        # cv2.imshow("Mask", mask)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        text = pytesseract.image_to_string(mask, config='--psm 6')
+        print(text)
+        return self.translateCoord(text)
+
     def lookatCoord(self):
         coord_capt = self.coordRegion.screenshot()
         coord_array = numpy.array(coord_capt)

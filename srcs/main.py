@@ -11,12 +11,15 @@ try:
     fighter = Fighter(game, '1', 2)
     farmer = Farmer(game,
                     fighter,
-                    'beacons/job/res/houblon.png',
+                    'beacons/job/res/avoine.png',
                     'beacons/job/act/faucher.png',
-                    2.)
+                    3.)
 except Exception as e:
     print(e)
     # exit(1)
+
+# game.readCoord()
+# exit()
 
 print("#### Dobototototot ###")
 print("| 1: farm")
@@ -31,3 +34,6 @@ elif x == 2:
     pilot.menu()
 elif x == 3:
     fighter.fight()
+elif x == 21:
+    pilot.menu()
+    farmer.farm()
