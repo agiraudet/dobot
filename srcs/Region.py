@@ -4,7 +4,6 @@ import pyautogui
 
 class Region:
     def __init__(self, x, y, w, h):
-        print("[Reg]Init...")
         self.x = x
         self.y = y
         self.w = w
@@ -18,6 +17,12 @@ class Region:
         pyautogui.moveTo(self.x + self.w, self.y + self.h)
         time.sleep(delay)
         pyautogui.moveTo(self.x, self.y + self.h)
+
+    def set(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
 
     def print(self):
         print("x:{} y:{} w:{} h:{}".format(self.x, self.y, self.w, self.h))

@@ -3,6 +3,8 @@ import numpy
 import pyautogui
 import random
 
+from Region import Region
+
 
 class Landmark:
 
@@ -10,7 +12,7 @@ class Landmark:
         self,
         region,
         imagePath,
-        hideSprite=True,
+        hideSprite=False,
         threshold=0.5,
         log=False,
         name='landmark',
@@ -28,6 +30,7 @@ class Landmark:
         self.offsetY = offsetY
         self.delayMouse = delayMouse
         self.pos = None
+        self.fullPos = Region(0, 0, 0, 0)
 
     def find(self):
         if self.hideSprite:
@@ -40,11 +43,16 @@ class Landmark:
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
         if maxVal < self.threshold:
             if self.log:
-                print(f"{self.logName} {self.maxVal} KO")
+                print(f"{self.name} {maxVal} KO")
             self.pos = None
             return False
         if self.log:
-            print(f"{self.logName} {self.maxVal} OK")
+            print(f"{self.name} {maxVal} OK")
+        self.fullPos.set(
+            maxLoc[0],
+            maxLoc[1],
+            self.beacon.shape[0],
+            self.beacon.shape[1])
         centerX = (maxLoc[0] + self.beacon.shape[1] // 2) + \
             self.region.x + self.offsetX
         centerY = (maxLoc[1] + self.beacon.shape[0] // 2) + \
@@ -53,7 +61,7 @@ class Landmark:
         return True
 
     def clickOn(self, forgetAfterClick=True):
-        if self.pos is not None:
+        if self.pos is None:
             self.find()
         if self.pos is not None:
             if self.delayMouse is not None:
@@ -62,3 +70,5 @@ class Landmark:
             pyautogui.click(self.pos[0], self.pos[1])
             if forgetAfterClick:
                 self.pos = None
+            return True
+        return False

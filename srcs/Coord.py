@@ -4,6 +4,7 @@ import pyautogui
 import time
 
 from ColorMask import ColorMask
+import colorTerm as ct
 
 
 class Coord:
@@ -31,9 +32,9 @@ class Coord:
         while int(time.time()) - startTime < timeout:
             newPixel = pyautogui.pixel(self.region.x + 1, self.region.y + 1)
             if newPixel != pixel:
+                time.sleep(0.1)
                 self.readCoord()
-                print(f"[Coord]Changed to {self.coord}")
                 return
 
         self.readCoord()
-        print(f"[Coord]Wait: timeout. Reading {self.coord}")
+        ct.announce(f"Wait: timeout. Reading {self.coord}", ct.CYAN, "Coord")

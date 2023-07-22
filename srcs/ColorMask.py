@@ -41,19 +41,32 @@ class ColorMask:
         if M["m00"] != 0:
             centerX = int(M["m10"] / M["m00"])
             centerY = int(M["m01"] / M["m00"])
-            centerX += self.game.region.x
-            centerY += self.game.region.y
+            centerX += self.region.x
+            centerY += self.region.y
             return (centerX, centerY)
         return None
 
-    def findClosestToPoint(self, pos, minArea=1, forceMakeMask=True):
+    def findClosestToPoint(self, pos, ref=None, minArea=1, forceMakeMask=True):
+        pointList = self.findGroupsPos(
+            minArea=minArea, forceMakeMask=forceMakeMask)
+        posX, posY = pos
+        distances_and_points = [(numpy.sqrt(
+            (posX - point[0])**2 + (posY - point[1])**2), point) for point in pointList]
+        if ref is not None:
+            refX, refY = ref
+            distances_and_points = [(distance, point) for distance, point in distances_and_points if
+                                    numpy.sqrt((posX - point[0])**2 + (posY - point[1])**2) < np.sqrt((refX - point[0])**2 + (refY - point[1])**2)]
+        sorted_distances_and_points = sorted(
+            distances_and_points, key=lambda x: x[0])
+        sorted_points = [point for _, point in sorted_distances_and_points]
+        return sorted_points
+
+    def findGroupsPos(self, minArea=1, forceMakeMask=True):
         if forceMakeMask or self.mask is None:
             self.makeMask()
-        posX, posY = pos
         contours, _ = cv2.findContours(
             self.mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        closestContour = None
-        closestDist = float('inf')
+        pointList = []
         for contour in contours:
             area = cv2.contourArea(contour)
             if area < minArea:
@@ -61,15 +74,6 @@ class ColorMask:
             M = cv2.moments(contour)
             contourCenterX = int(M["m10"] / M["m00"])
             contourCenterY = int(M["m01"] / M["m00"])
-            distance = numpy.sqrt((posX - contourCenterX)
-                                  ** 2 + (posY - contourCenterY)**2)
-            if distance < closestDist:
-                closestContour = contour
-                closestDist = distance
-        if closestContour is not None:
-            M = cv2.moments(closestContour)
-            closestCenterX = int(M["m10"] / M["m00"])
-            closestCenterY = int(M["m01"] / M["m00"])
-            return closestCenterX, closestCenterY
-        else:
-            return None
+            pointList.append((contourCenterX + self.region.x,
+                             contourCenterY + self.region.y))
+        return pointList
