@@ -59,7 +59,8 @@ class Game:
         discoBtn.find()
         chatBtn.find()
         if discoBtn.pos is None or chatBtn.pos is None:
-            raise Exception("Could not locate game window")
+            raise RuntimeError(
+                "Could not locate game window.\nCheck that the game is open, visible, and that your are logged in.")
         return Region(
             x=chatBtn.fullPos.x,
             y=discoBtn.fullPos.y,

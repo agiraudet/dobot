@@ -9,7 +9,6 @@ import colorTerm as ct
 
 class Pilot:
     def __init__(self, game):
-        ct.announce("Init...", ct.BLUE, "Pilot")
         self.game = game
         self.coord = Coord(game.regionMap['coord'])
         self.histo = []
@@ -19,7 +18,6 @@ class Pilot:
         self.curY = 0
 
     def init(self):
-        oldX, oldY = pyautogui.position()
         pyautogui.moveTo(self.game.regionMap['game'].x
                          + self.game.regionMap['game'].w / 2,
                          self.game.regionMap['game'].y
@@ -31,7 +29,6 @@ class Pilot:
             ct.announce(f"Init at {self.coord.coord}", ct.BLUE, "Pilot")
             self.histo = []
             self.realCoord = []
-        pyautogui.moveTo(oldX, oldY)
 
     def group_pixels(self, points, radius):
         grouped_points = []
@@ -209,29 +206,37 @@ class Pilot:
         ct.announce(f"{self.histo}", ct.BLUE, "Pilot")
         return True
 
-    def menu(self):
+    def start(self, waypoints, patrol=False):
         self.init()
-        print('##### AutoPilot targeting #####')
-        i = 0
-        while True:
-            print(f'| Point {i}:')
-            i += 1
-            x = input('| x> ')
-            y = input('| y> ')
-            self.waypoints.append((int(x), int(y)))
-
-            m = ' '
-            while m != 'A' and m != 'a' and m != 'G' and m != 'g':
-                m = input("| (A)dd waypoint/(G)o> ")
-            if m == 'g' or m == 'G':
-                break
-        print(f"| {i} Waypoints.")
-        print('###############################')
-        pyautogui.moveTo(self.game.regionMap['game'].x
-                         + self.game.regionMap['game'].w / 2,
-                         self.game.regionMap['game'].y
-                         + self.game.regionMap['game'].h / 2)
-        for wp in self.waypoints:
+        ct.announce(f"Going to: {waypoints}", ct.BLUE, "Pilot")
+        for wp in waypoints:
             if self.navigateTo(wp[0], wp[1]) is False:
                 return False
         return True
+
+    # def menu(self):
+    #     self.init()
+    #     print('##### AutoPilot targeting #####')
+    #     i = 0
+    #     while True:
+    #         print(f'| Point {i}:')
+    #         i += 1
+    #         x = input('| x> ')
+    #         y = input('| y> ')
+    #         self.waypoints.append((int(x), int(y)))
+    #
+    #         m = ' '
+    #         while m != 'A' and m != 'a' and m != 'G' and m != 'g':
+    #             m = input("| (A)dd waypoint/(G)o> ")
+    #         if m == 'g' or m == 'G':
+    #             break
+    #     print(f"| {i} Waypoints.")
+    #     print('###############################')
+    #     pyautogui.moveTo(self.game.regionMap['game'].x
+    #                      + self.game.regionMap['game'].w / 2,
+    #                      self.game.regionMap['game'].y
+    #                      + self.game.regionMap['game'].h / 2)
+    #     for wp in self.waypoints:
+    #         if self.navigateTo(wp[0], wp[1]) is False:
+    #             return False
+    #     return True

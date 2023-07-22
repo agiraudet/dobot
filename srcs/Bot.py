@@ -14,7 +14,7 @@ class Bot:
         try:
             self.game = Game()
         except Exception as e:
-            ct.printc(e, ct.RED)
+            ct.announce(f"{ct.RED}{e}{ct.RESET}", ct.RED, "Error")
             exit(1)
 
     def initModes(self):
@@ -30,18 +30,23 @@ class Bot:
         ct.printc("██████╔╝╚██████╔╝██████╔╝╚██████╔╝   ██║", clr)
         ct.printc("╚═════╝  ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝", clr)
 
-    def displayMenu(self, menuTitle, optionList, color):
+    def displayMenu(self, menuTitle, optionList, color, tabs=0):
         nOpt = "├"
         lastOpt = "└"
         dash = "─"
         i = 1
-        ct.printc(menuTitle, ct.BOLD + color)
+        tabsLine = ''
+        tabsSpace = ''
+        if tabs > 0:
+            tabsLine = tabs * ' ' + lastOpt + dash
+            tabsSpace = (tabs + 2) * ' '
+        ct.printc(f"{tabsLine}{menuTitle}", ct.BOLD + color)
         for opt in optionList:
             if i < len(optionList):
                 bullet = nOpt
             else:
                 bullet = lastOpt
-            ct.printc(f"{bullet}{dash}{i}{dash} {opt}", color)
+            ct.printc(f"{tabsSpace}{bullet}{dash}{i}{dash} {opt}", color)
             i += 1
         while True:
             x = input("> ")
@@ -70,13 +75,32 @@ class Bot:
     def farmingMenu(self):
         basePath = "beacons/job/"
         jobList = self.getDirList(basePath)
-        x = self.displayMenu("Pick a job", jobList, ct.GREEN)
+        x = self.displayMenu("Pick a job", jobList, ct.GREEN, tabs=2)
         job = jobList[x]
         action = basePath + job + "/act.png"
         resList = self.getPngFiles(basePath + job)
-        x = self.displayMenu("Pick a ressource", resList, ct.GREEN)
+        x = self.displayMenu("Pick a ressource", resList, ct.GREEN, tabs=4)
         res = basePath + job + '/' + resList[x] + '.png'
         return Farmer(self.game, job, res, action)
+
+    def addWaypoint(self, tabs=0):
+        tabSpace = ' ' * tabs
+        x = input(ct.BLUE + tabSpace + '└─X: ' + ct.RESET)
+        y = input(ct.BLUE + tabSpace + '└─Y: ' + ct.RESET)
+        return int(x), int(y)
+
+    def pilotMenu(self):
+        waypoints = []
+        i = 0
+        x = 0
+        while x != 1:
+            print(x)
+            i += 1
+            ct.printc(f"Point {i}:", ct.BLUE)
+            waypoints.append(self.addWaypoint(tabs=4))
+            x = self.displayMenu(
+                "What's next ?", ["Add waypoint", "Start running"], ct.BLUE, tabs=4)
+        self.pilot.start(waypoints)
 
     def start(self):
         self.banner()
@@ -102,7 +126,8 @@ class Bot:
                     farmer.printCount()
 
             elif x == 1:
-                self.pilot.menu()
+                self.pilotMenu()
+                # self.pilot.menu()
             elif x == 2:
                 self.fighter.fight()
             elif x == 3:
