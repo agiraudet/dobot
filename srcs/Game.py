@@ -1,4 +1,5 @@
 import pyautogui
+import json
 
 from Region import Region
 from Landmark import Landmark
@@ -13,6 +14,25 @@ class Game:
         self.regionMap['gui'] = self.createGuiRegion()
         self.cellW = self.regionMap['game'].w / 28
         self.cellH = self.regionMap['game'].h / 34
+        self.loadConf()
+
+    def loadConf(self):
+        with open('conf.json', 'r') as confFile:
+            self.conf = json.load(confFile)
+
+    def getConf(self, *args):
+        return self.recConf(self.conf, *args)
+
+    def recConf(self, confData, *args):
+        if len(args) == 0:
+            return confData
+        elif len(args) == 1:
+            return confData[args[0]]
+        else:
+            if args[0] not in confData:
+                raise KeyError(f"{args[0]} not in conf.json")
+            else:
+                return self.recConf(confData[args[0]], *args[1:])
 
     def createGlobalRegion(self):
         size = pyautogui.size()

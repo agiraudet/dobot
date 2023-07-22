@@ -6,27 +6,33 @@ import colorTerm as ct
 
 
 class Farmer:
-    def __init__(self, game, resFile, actFile, delayFarm=(2.5, 3.)):
+    def __init__(self, game, job, resFile, actFile):
         ct.announce("Init...", ct.GREEN, "Farmer")
         self.game = game
-        self.rdyBtn = Landmark(
-            game.regionMap['game'],
-            'beacons/btn/ready.png',
-            threshold=0.8,
-            name='readyBtn')
-        self.action = Landmark(
-            game.regionMap['game'],
-            actFile,
-            threshold=0.8,
-            log=True,
-            name='collectBtn')
-        self.ressource = Landmark(
-            game.regionMap['game'],
-            resFile,
-            threshold=0.4,
-            log=True,
-            name='ressource')
-        self.delay = delayFarm
+        self.job = job
+        try:
+            self.rdyBtn = Landmark(
+                game.regionMap['game'],
+                'beacons/btn/ready.png',
+                threshold=0.8,
+                name='ready')
+            self.action = Landmark(
+                game.regionMap['game'],
+                actFile,
+                threshold=game.getConf('jobs', job, 'action', 'threshold'),
+                log=game.getConf('jobs', job, 'action', 'log'),
+                name='collect')
+            self.ressource = Landmark(
+                game.regionMap['game'],
+                resFile,
+                threshold=game.getConf('jobs', job, 'ressource', 'threshold'),
+                log=game.getConf('jobs', job, 'ressource', 'log'),
+                name='ressource')
+            self.delay = (game.getConf('jobs', job, 'delay', 'min'),
+                          game.getConf('jobs', job, 'delay', 'max'))
+        except KeyError as e:
+            ct.announce(f"{ct.RED}{e}{ct.RESET}", ct.RED, "Error")
+            exit(1)
         self.count = 0
 
     def collect(self):

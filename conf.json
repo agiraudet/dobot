@@ -1,0 +1,32 @@
+{
+  "jobs": {
+    "mineur": {
+      "ressource": {
+        "log": true,
+        "threshold": 0.8
+      },
+      "action": {
+        "log": false,
+        "threshold": 0.8
+      },
+      "delay": {
+        "min": 12.0,
+        "max": 13.5
+      }
+    },
+    "paysan": {
+      "ressource": {
+        "log": true,
+        "threshold": 0.4
+      },
+      "action": {
+        "log": false,
+        "threshold": 0.8
+      },
+      "delay": {
+        "min": 2.5,
+        "max": 3.0
+      }
+    }
+  }
+}

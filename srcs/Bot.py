@@ -1,5 +1,6 @@
 import os
 import glob
+import json
 
 from Game import Game
 from Pilot import Pilot
@@ -10,6 +11,7 @@ import colorTerm as ct
 
 class Bot:
     def __init__(self):
+        self.conf = None
         try:
             self.game = Game()
         except Exception as e:
@@ -75,7 +77,7 @@ class Bot:
         resList = self.getPngFiles(basePath + job)
         x = self.displayMenu("Pick a ressource", resList, ct.GREEN)
         res = basePath + job + '/' + resList[x] + '.png'
-        return Farmer(self.game, res, action)
+        return Farmer(self.game, job, res, action)
 
     def start(self):
         self.banner()
