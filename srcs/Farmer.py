@@ -27,6 +27,7 @@ class Farmer:
                 resFile,
                 threshold=game.getConf('jobs', job, 'ressource', 'threshold'),
                 log=game.getConf('jobs', job, 'ressource', 'log'),
+                randomize=True,
                 name='ressource')
             self.delay = (game.getConf('jobs', job, 'delay', 'min'),
                           game.getConf('jobs', job, 'delay', 'max'))

@@ -20,7 +20,7 @@ class Landmark:
         offsetX=0,
         offsetY=0,
         delayMouse=(0.2, 1.),  # Set to None for no delay
-        randomize=True
+        randomize=False
     ):
         self.region = region
         self.beacon = cv2.imread(imagePath, 0)
@@ -35,12 +35,29 @@ class Landmark:
         self.fullPos = Region(0, 0, 0, 0)
         self.randomize = randomize
 
-    def logConf(self, maxVal):
+    def logConfidence(self, maxVal):
         color = ct.GREEN
         if maxVal < self.threshold:
             color = ct.RED
         confidence = f"{ct.BOLD}{color}{maxVal*100: .2f}%{ct.RESET}"
         ct.announce(f"{self.name} {confidence}", ct.GREEN, "Farmer")
+
+    def setPos(self):
+        if self.randomize:
+            posX = (self.fullPos.x
+                    + random.randint(1, self.beacon.shape[1] - 1)
+                    + self.region.x + self.offsetX)
+            posY = (self.fullPos.y
+                    + random.randint(1, self.beacon.shape[0] - 1)
+                    + self.region.y + self.offsetY)
+            self.pos = (posX, posY)
+        else:
+            # Switched shape[0] and shape[1], in case of trouble, switch back.
+            centerX = (self.fullPos.x + self.beacon.shape[1] // 2) + \
+                self.region.x + self.offsetX
+            centerY = (self.fullPos.y + self.beacon.shape[0] // 2) + \
+                self.region.y + self.offsetY
+            self.pos = (centerX, centerY)
 
     def find(self):
         if self.hideSprite:
@@ -53,21 +70,17 @@ class Landmark:
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
         if maxVal < self.threshold:
             if self.log:
-                self.logConf(maxVal)
+                self.logConfidence(maxVal)
             self.pos = None
             return False
         if self.log:
-            self.logConf(maxVal)
+            self.logConfidence(maxVal)
         self.fullPos.set(
             maxLoc[0],
             maxLoc[1],
             self.beacon.shape[0],
             self.beacon.shape[1])
-        centerX = (maxLoc[0] + self.beacon.shape[1] // 2) + \
-            self.region.x + self.offsetX
-        centerY = (maxLoc[1] + self.beacon.shape[0] // 2) + \
-            self.region.y + self.offsetY
-        self.pos = (centerX, centerY)
+        self.setPos()
         return True
 
     def clickOn(self, forgetAfterClick=True):
