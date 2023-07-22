@@ -18,32 +18,24 @@ class Farmer:
             game.regionMap['game'],
             actFile,
             threshold=0.8,
+            log=True,
             name='collectBtn')
         self.ressource = Landmark(
             game.regionMap['game'],
             resFile,
             threshold=0.4,
+            log=True,
             name='ressource')
         self.delay = delayFarm
         self.count = 0
-        self.falsePositive = {}
 
     def collect(self):
-        self.ressource.find()
-        if self.ressource.pos in self.falsePositive \
-                and self.falsePositive[self.ressource.pos] > 2:
-            self.falsePositive[self.ressource.pos] += 1
-            return False
         self.ressource.clickOn()
         collected = self.action.clickOn()
         if collected:
             self.count += 1
             return True
         else:
-            if self.ressource.pos in self.falsePositive:
-                self.falsePositive[self.ressource.pos] += 1
-            else:
-                self.falsePositive[self.ressource.pos] = 0
             return False
 
     def checkFight(self):

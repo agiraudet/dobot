@@ -4,6 +4,7 @@ import pyautogui
 import random
 
 from Region import Region
+import colorTerm as ct
 
 
 class Landmark:
@@ -18,7 +19,8 @@ class Landmark:
         name='landmark',
         offsetX=0,
         offsetY=0,
-        delayMouse=(0.2, 1.)  # Set to None for no delay
+        delayMouse=(0.2, 1.),  # Set to None for no delay
+        randomize=True
     ):
         self.region = region
         self.beacon = cv2.imread(imagePath, 0)
@@ -31,6 +33,14 @@ class Landmark:
         self.delayMouse = delayMouse
         self.pos = None
         self.fullPos = Region(0, 0, 0, 0)
+        self.randomize = randomize
+
+    def logConf(self, maxVal):
+        color = ct.GREEN
+        if maxVal < self.threshold:
+            color = ct.RED
+        confidence = f"{ct.BOLD}{color}{maxVal*100: .2f}%{ct.RESET}"
+        ct.announce(f"{self.name} {confidence}", ct.GREEN, "Farmer")
 
     def find(self):
         if self.hideSprite:
@@ -43,11 +53,11 @@ class Landmark:
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
         if maxVal < self.threshold:
             if self.log:
-                print(f"{self.name} {maxVal} KO")
+                self.logConf(maxVal)
             self.pos = None
             return False
         if self.log:
-            print(f"{self.name} {maxVal} OK")
+            self.logConf(maxVal)
         self.fullPos.set(
             maxLoc[0],
             maxLoc[1],
@@ -64,10 +74,17 @@ class Landmark:
         if self.pos is None:
             self.find()
         if self.pos is not None:
+            x, y = self.pos
+            if self.randomize:
+                x += random.randint(-3, 3)
+                y += random.randint(-3, 3)
             if self.delayMouse is not None:
-                pyautogui.moveTo(self.pos[0], self.pos[1], random.uniform(
-                    self.delayMouse[0], self.delayMouse[1]), pyautogui.easeOutQuad)
-            pyautogui.click(self.pos[0], self.pos[1])
+                pyautogui.moveTo(x,
+                                 y,
+                                 random.uniform(
+                                     self.delayMouse[0], self.delayMouse[1]),
+                                 pyautogui.easeOutQuad)
+            pyautogui.click(x, y)
             if forgetAfterClick:
                 self.pos = None
             return True

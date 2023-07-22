@@ -69,11 +69,11 @@ class Bot:
     def farmingMenu(self):
         basePath = "beacons/job/"
         jobList = self.getDirList(basePath)
-        x = self.displayMenu("Pick a job", jobList)
+        x = self.displayMenu("Pick a job", jobList, ct.GREEN)
         job = jobList[x]
         action = basePath + job + "/act.png"
         resList = self.getPngFiles(basePath + job)
-        x = self.displayMenu("Pick a ressource", resList)
+        x = self.displayMenu("Pick a ressource", resList, ct.GREEN)
         res = basePath + job + '/' + resList[x] + '.png'
         return Farmer(self.game, res, action)
 
