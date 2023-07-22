@@ -1,6 +1,5 @@
 import os
 import glob
-import json
 
 from Game import Game
 from Pilot import Pilot
@@ -24,7 +23,7 @@ class Bot:
 
     def banner(self):
         clr = ct.YELLOW
-        ct.printc("██████╗  ██████╗ ██████╗  ██████╗ ████████╗", clr)
+        ct.printc("\n██████╗  ██████╗ ██████╗  ██████╗ ████████╗", clr)
         ct.printc("██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝", clr)
         ct.printc("██║  ██║██║   ██║██████╔╝██║   ██║   ██║", clr)
         ct.printc("██║  ██║██║   ██║██╔══██╗██║   ██║   ██║", clr)

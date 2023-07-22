@@ -54,7 +54,6 @@ class Farmer:
         ct.announce(f"collected {self.count} times.", ct.GREEN, "Farmer")
 
     def farm(self):
-        print("[Farmer]Starting farming...")
         ct.announce("Started farming", ct.GREEN, "Farmer")
         while True:
             if self.checkFight():
