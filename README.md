@@ -61,6 +61,30 @@ chmod +x start.sh && ./start.sh
 
 **Note:** Running the bot while the game is active should be done with caution, and it is advisable to thoroughly review the game's terms of service and ensure compliance with the rules and regulations set forth by the game developers.
 
+## Functionalities
+
+**Dobot** comes equipped with several powerful functionalities that enable it to perform various tasks autonomously within the game Dofus Retro (version 1.29). These functionalities are designed to simplify gameplay and provide convenience to the users. Here are the key features of **Dobot**:
+
+### 1. Autonomous Resource Farming
+
+**Dobot** allows the user to select a specific job and resource, enabling the bot to autonomously search for, approach, and farm the chosen resource. The bot utilizes image recognition and coordinates to locate the resource and efficiently gather it.
+
+### 2. Basic Fights Handling
+
+**Dobot** has the ability to handle basic fights within the game. Whether it's defending against monsters while farming or engaging in simple combat scenarios, the bot can use combat strategies to manage the encounters effectively.
+
+### 3. Automated Navigation
+
+The bot can navigate the game world autonomously by going to specified coordinates. By leveraging image recognition and in-game information, **Dobot** can move to designated points on the map, enabling seamless exploration and resource gathering.
+
+### 4. Routine Recording and Playback
+
+**Dobot** introduces the concept of Routines, which are sequences of mouse clicks and actions recorded by the user. These Routines can be saved and later replayed by the bot. This feature streamlines repetitive tasks and provides users with the ability to automate complex actions easily.
+
+### 5. Advanced Farmer Functionality
+
+The Farmer part of **Dobot** combines multiple functionalities to optimize resource gathering. It intelligently searches for the specified resource and, if the current map is devoid of the desired resource, follows a predefined routine to change maps and continue the search. Moreover, it can detect and engage resource protectors to ensure smooth farming operations.
+
 ## Contributing
 
 Contributions to **Dobot** are welcome! If you find any issues, have suggestions for improvements, or would like to add new features, please feel free to submit a pull request. However, keep in mind the educational and non-competitive nature of this project.
