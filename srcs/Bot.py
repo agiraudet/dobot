@@ -5,6 +5,7 @@ from Game import Game
 from Pilot import Pilot
 from Fighter import Fighter
 from Farmer import Farmer
+from Routine import RoutineMaster
 import colorTerm as ct
 
 
@@ -20,6 +21,7 @@ class Bot:
     def initModes(self):
         self.pilot = Pilot(self.game)
         self.fighter = Fighter(self.game, '1', 2)
+        self.rtMaster = RoutineMaster(self.game.regionMap['game'])
 
     def banner(self):
         clr = ct.YELLOW
@@ -29,34 +31,6 @@ class Bot:
         ct.printc("██║  ██║██║   ██║██╔══██╗██║   ██║   ██║", clr)
         ct.printc("██████╔╝╚██████╔╝██████╔╝╚██████╔╝   ██║", clr)
         ct.printc("╚═════╝  ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝", clr)
-
-    def displayMenu(self, menuTitle, optionList, color, tabs=0):
-        nOpt = "├"
-        lastOpt = "└"
-        dash = "─"
-        i = 1
-        tabsLine = ''
-        tabsSpace = ''
-        if tabs > 0:
-            tabsLine = tabs * ' ' + lastOpt + dash
-            tabsSpace = (tabs + 2) * ' '
-        ct.printc(f"{tabsLine}{menuTitle}", ct.BOLD + color)
-        for opt in optionList:
-            if i < len(optionList):
-                bullet = nOpt
-            else:
-                bullet = lastOpt
-            ct.printc(f"{tabsSpace}{bullet}{dash}{i}{dash} {opt}", color)
-            i += 1
-        while True:
-            x = input("> ")
-            try:
-                xi = int(x) - 1
-                if xi >= len(optionList) or xi < 0:
-                    raise ValueError("out of range")
-                return xi
-            except ValueError:
-                ct.printc("Not a valid input", ct.RED)
 
     def getPngFiles(self, path):
         pngFiles = []
@@ -75,13 +49,17 @@ class Bot:
     def farmingMenu(self):
         basePath = "beacons/job/"
         jobList = self.getDirList(basePath)
-        x = self.displayMenu("Pick a job", jobList, ct.GREEN, tabs=2)
+        x = ct.displayMenu("Pick a job", jobList, ct.GREEN, tabs=2)
         job = jobList[x]
         action = basePath + job + "/act.png"
         resList = self.getPngFiles(basePath + job)
-        x = self.displayMenu("Pick a ressource", resList, ct.GREEN, tabs=4)
+        x = ct.displayMenu("Pick a ressource", resList, ct.GREEN, tabs=4)
         res = basePath + job + '/' + resList[x] + '.png'
-        return Farmer(self.game, job, res, action)
+        x = ct.displayMenu("Add a routine ?", ["y", "n"], ct.GREEN, tabs=6)
+        rt = None
+        if x == 0:
+            rt = self.rtMaster.selectRoutine(tabs=8)
+        return Farmer(self.game, job, res, action, rt)
 
     def addWaypoint(self, tabs=0):
         tabSpace = ' ' * tabs
@@ -98,9 +76,27 @@ class Bot:
             i += 1
             ct.printc(f"Point {i}:", ct.BLUE)
             waypoints.append(self.addWaypoint(tabs=4))
-            x = self.displayMenu(
-                "What's next ?", ["Add waypoint", "Start running"], ct.BLUE, tabs=4)
+            x = ct.displayMenu(
+                "What's next ?", ["add waypoint", "start running"], ct.BLUE, tabs=4)
         self.pilot.start(waypoints)
+
+    def routineMenu(self):
+        x = ct.displayMenu("What about routines ?",
+                           ["new",
+                            "run",
+                            "delete"],
+                           ct.MAGENTA,
+                           tabs=2)
+        if x == 0:
+            self.rtMaster.newRoutine()
+        elif x == 1:
+            rt = self.rtMaster.selectRoutine(tabs=4)
+            if rt is not None:
+                rt.doAllSteps(delay=5)
+        else:
+            rt = self.rtMaster.selectRoutine(tabs=4)
+            if rt is not None:
+                self.rtMaster.deleteRoutineByName(rt.name)
 
     def start(self):
         self.banner()
@@ -109,12 +105,13 @@ class Bot:
 
     def menu(self):
         while True:
-            x = self.displayMenu("What do you want to do ?",
-                                 ["Farm",
-                                  "GoTo",
-                                  "Fight",
-                                  "Exit"],
-                                 ct.YELLOW)
+            x = ct.displayMenu("What do you want to do ?",
+                               ["farm",
+                                "goTo",
+                                "fight",
+                                "routine",
+                                "exit"],
+                               ct.YELLOW)
             if x == 0:
                 farmer = self.farmingMenu()
                 try:
@@ -131,4 +128,6 @@ class Bot:
             elif x == 2:
                 self.fighter.fight()
             elif x == 3:
+                self.routineMenu()
+            else:
                 exit(0)

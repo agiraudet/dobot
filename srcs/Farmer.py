@@ -1,15 +1,17 @@
 import random
 import time
+import pyautogui
 
 from Landmark import Landmark
 import colorTerm as ct
 
 
 class Farmer:
-    def __init__(self, game, job, resFile, actFile):
+    def __init__(self, game, job, resFile, actFile, routine=None):
         ct.announce("Init...", ct.GREEN, "Farmer")
         self.game = game
         self.job = job
+        self.routine = routine
         try:
             self.rdyBtn = Landmark(
                 game.regionMap['game'],
@@ -35,6 +37,8 @@ class Farmer:
             ct.announce(f"{ct.RED}{e}{ct.RESET}", ct.RED, "Error")
             exit(1)
         self.count = 0
+        self.fail = 0
+        self.routineStepThreshold = 5
 
     def collect(self):
         self.ressource.clickOn()
@@ -43,6 +47,14 @@ class Farmer:
             self.count += 1
             return True
         else:
+            if self.fail == 3:
+                pyautogui.press('enter')
+            if self.fail >= self.routineStepThreshold and self.routine is not None:
+                self.fail = 0
+                self.routine.nextStep(replay=True)
+                time.sleep(3)
+            else:
+                self.fail += 1
             return False
 
     def checkFight(self):
