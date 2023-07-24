@@ -3,7 +3,8 @@
     "mineur": {
       "ressource": {
         "log": true,
-        "threshold": 0.8
+        "threshold": 0.8,
+        "checkMirror": true
       },
       "action": {
         "log": false,
@@ -17,7 +18,8 @@
     "paysan": {
       "ressource": {
         "log": true,
-        "threshold": 0.4
+        "threshold": 0.4,
+        "checkMirror": false
       },
       "action": {
         "log": false,

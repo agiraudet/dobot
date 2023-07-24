@@ -12,6 +12,8 @@ class Farmer:
         self.game = game
         self.job = job
         self.routine = routine
+        if routine is not None:
+            self.routine.delayMouse = (0.8, 1.2)
         try:
             self.rdyBtn = Landmark(
                 game.regionMap['game'],
@@ -30,6 +32,8 @@ class Farmer:
                 threshold=game.getConf('jobs', job, 'ressource', 'threshold'),
                 log=game.getConf('jobs', job, 'ressource', 'log'),
                 randomize=True,
+                checkMirror=game.getConf(
+                    'jobs', job, 'ressource', 'checkMirror'),
                 name='ressource')
             self.delay = (game.getConf('jobs', job, 'delay', 'min'),
                           game.getConf('jobs', job, 'delay', 'max'))
@@ -48,8 +52,10 @@ class Farmer:
             return True
         else:
             if self.fail == 3:
+                self.game.focusRegion('game')
                 pyautogui.press('enter')
-            if self.fail >= self.routineStepThreshold and self.routine is not None:
+            if self.fail >= self.routineStepThreshold \
+                    and self.routine is not None:
                 self.fail = 0
                 self.routine.nextStep(replay=True)
                 time.sleep(3)

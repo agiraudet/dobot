@@ -83,3 +83,9 @@ class Game:
             w=self.regionMap['game'].w,
             h=self.regionMap['game'].h / 2
         )
+
+    def focusRegion(self, regionName):
+        region = self.regionMap[regionName]
+        if region is not None:
+            pyautogui.moveTo(region.x + region.w / 2,
+                             region.y + region.h / 2)

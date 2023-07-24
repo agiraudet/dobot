@@ -20,7 +20,8 @@ class Landmark:
         offsetX=0,
         offsetY=0,
         delayMouse=(0.2, 1.),  # Set to None for no delay
-        randomize=False
+        randomize=False,
+        checkMirror=False
     ):
         self.region = region
         self.beacon = cv2.imread(imagePath, 0)
@@ -33,7 +34,9 @@ class Landmark:
         self.delayMouse = delayMouse
         self.pos = None
         self.fullPos = Region(0, 0, 0, 0)
-        self.randomize = randomize
+        self.randomize = randomize,
+        self.checkMirror = checkMirror
+        self.beaconMirror = cv2.flip(self.beacon, 1)
 
     def logConfidence(self, maxVal):
         color = ct.GREEN
@@ -52,7 +55,6 @@ class Landmark:
                     + self.region.y + self.offsetY)
             self.pos = (posX, posY)
         else:
-            # Switched shape[0] and shape[1], in case of trouble, switch back.
             centerX = (self.fullPos.x + self.beacon.shape[1] // 2) + \
                 self.region.x + self.offsetX
             centerY = (self.fullPos.y + self.beacon.shape[0] // 2) + \
@@ -68,6 +70,10 @@ class Landmark:
         scGray = cv2.cvtColor(numpy.array(sc), cv2.COLOR_RGB2GRAY)
         result = cv2.matchTemplate(scGray, self.beacon, cv2.TM_CCOEFF_NORMED)
         minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
+        if self.checkMirror and maxVal < self.threshold:
+            result = cv2.matchTemplate(
+                scGray, self.beaconMirror, cv2.TM_CCOEFF_NORMED)
+            minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
         if maxVal < self.threshold:
             if self.log:
                 self.logConfidence(maxVal)

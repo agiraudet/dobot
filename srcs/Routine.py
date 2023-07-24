@@ -71,7 +71,8 @@ class RoutineMaster:
         return (refX, refY)
 
     def onLeftClick(self, x, y, button, pressed):
-        if button == pynput.mouse.Button.left and pressed and self.wipRoutine is not None:
+        if button == pynput.mouse.Button.left and pressed \
+                and self.wipRoutine is not None:
             self.wipRoutine.addStep(self.convertPosToRef(x, y))
             ct.announce(f"Clicked ({x},{y})", ct.MAGENTA, "Routine")
         elif button == pynput.mouse.Button.right and pressed:
@@ -82,9 +83,10 @@ class RoutineMaster:
         while True:
             name = input("> ")
             if name in self.routinesMap:
-                x = ct.displayMenu(f"{name} already exist. Do you want to replace it ?",
-                                   ["y", "n"],
-                                   ct.MAGENTA)
+                x = ct.displayMenu(
+                    f"{name} already exist. Do you want to replace it ?",
+                    ["y", "n"],
+                    ct.MAGENTA)
                 if x == 1:
                     continue
             self.wipRoutine.setName(name)
@@ -97,7 +99,9 @@ class RoutineMaster:
         self.wipRoutine = Routine(self.reference)
         with pynput.mouse.Listener(on_click=self.onLeftClick) as listener:
             ct.announce(
-                "Started Recording. Right-click to end.", ct.MAGENTA, "Routine")
+                "Started Recording. Right-click to end.",
+                ct.MAGENTA,
+                "Routine")
             listener.join()
             ct.announce("Stopped recording", ct.MAGENTA, "Routine")
         self.chooseName()
